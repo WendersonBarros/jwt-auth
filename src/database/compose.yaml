@@ -1,0 +1,10 @@
+name: authnode
+services:
+    database:
+        image: 'postgres:16.0-alpine3.18'
+        volumes:
+          - ./01-account.sql:/docker-entrypoint-initdb.d/01-account.sql
+        env_file:
+            - ../../.docker.env
+        ports:
+            - '5432:5432'
