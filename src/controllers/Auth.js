@@ -36,10 +36,12 @@ module.exports = {
       const token = jwt.sign(
         userInfoToSend,
         process.env.PRIVATE_KEY,
-        { expiresIn: '1m' }
+        { expiresIn: '2m' }
       );
 
-      return res.status(200).json(token);
+      res.cookie("token", token, { expiresIn: "2m" })
+
+      return res.status(200).json(userInfoToSend);
     } catch (error) {
       console.error(error);
       return res
@@ -70,5 +72,20 @@ module.exports = {
         .status(401)
         .send("There might be a problem. Please, try again.")
     }
-  }
+  },
+
+  validateUser: async (req, res) => {
+    const [, token] = req.headers.authorization.split(" ");
+
+    try {
+      const { id, name } = jwt.verify(token, process.env.PRIVATE_KEY);
+
+      return res.status(200).send({ id, name });
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(401)
+        .send("Token invalid or incorrect!");
+    }
+  },
 };
