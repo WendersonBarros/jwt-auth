@@ -16,11 +16,11 @@ function AuthRoutesWrapper() {
     )
   }
 
-  if (authenticatedUser) {
-    return <Outlet />;
+  if (!authenticatedUser) {
+    return <Navigate to="/login" />
   }
 
-  return <Navigate to="/login" />
+  return <Outlet />;
 }
 
 export default function CustomRouter() {

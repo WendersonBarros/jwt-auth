@@ -16,7 +16,7 @@ module.exports = {
         return res
           .status(401)
           .send("Login incorrect or account not registered!");
-      };
+      }
 
       const passwordMatch = await bcrypt.compare(
         password, user.rows[0].password
@@ -36,12 +36,10 @@ module.exports = {
       const token = jwt.sign(
         userInfoToSend,
         process.env.PRIVATE_KEY,
-        { expiresIn: '2m' }
+        { expiresIn: '2h' }
       );
 
-      res.cookie("token", token, { expiresIn: "2m" })
-
-      return res.status(200).json(userInfoToSend);
+      return res.status(200).json({ ...userInfoToSend, token });
     } catch (error) {
       console.error(error);
       return res

@@ -6,7 +6,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -18,7 +18,7 @@ const AuthProvider = ({ children }) => {
         if (tokenCookie) {
           const [, token] = tokenCookie.split("=");
 
-          const authenticatedUser = await api.get('/validateuser',
+          const { data: { id, name } } = await api.get('/validateuser',
             {
               headers: {
                 'Authorization': 'Bearer ' + token,
@@ -27,16 +27,25 @@ const AuthProvider = ({ children }) => {
             }
           );
 
-          console.log(authenticatedUser.response.data)
+          setAuthenticatedUser({ id, name })
         }
       } catch (error) {
-        console.error("error", error.response.data);
+        console.error("error", error.data);
+      } finally {
+        setLoading(false);
       }
-    })()
+    })();
   }, [])
 
   return (
-    <AuthContext.Provider value={{ authenticatedUser, loading }}>
+    <AuthContext.Provider value={
+      {
+        authenticatedUser,
+        setAuthenticatedUser,
+        loading,
+        setLoading
+      }
+    }>
       {children}
     </AuthContext.Provider>
   )

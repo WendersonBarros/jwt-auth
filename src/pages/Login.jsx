@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  const { setAuthenticatedUser } = useContext(AuthContext);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const onChange = (event) => {
     if (event.target.type === "text") {
@@ -27,12 +31,24 @@ function Login() {
       return;
     }
 
-    const response = await api.post("/login", { login, password });
-    console.log({response})
+    try {
+      const { data: { id, name, token } } = await api.post(
+        "/login",
+        { login, password }
+      );
+      setAuthenticatedUser({ id, name })
+
+      // 2hr = 2*60*60 = 7200
+      document.cookie = `token=${token}; max-age=7200; path=/;`;
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      alert(error.response.data);
+    }
   }
 
   const onRegisterClick = () => {
-    console.log("on register")
+    navigate("/register");
   }
 
   return (

@@ -1,4 +1,4 @@
-require('dotenv').config({path: ['.docker.env', '.env']});
+require('dotenv').config({ path: ['.docker.env', '.env'] });
 const express = require('express');
 const cors = require('cors');
 const { login, register, validateUser } = require('./controllers/Auth');
@@ -7,7 +7,10 @@ const { homePage } = require('./controllers/Home');
 
 const port = 3000;
 const app = express();
-app.use(cors());
+app.use(cors({
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json());
 
 app.get("/", checkToken, homePage);
