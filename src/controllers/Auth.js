@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { query } = require('../database/database');
+const { redis } = require('./utils/redis');
 
 module.exports = {
   login: async (req, res) => {
@@ -86,4 +87,6 @@ module.exports = {
         .send("Token invalid or incorrect!");
     }
   },
+
+  logout: async (req, res) => {}
 };
