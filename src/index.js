@@ -1,10 +1,10 @@
 require('dotenv').config({ path: ['.docker.env', '.env'] });
 const express = require('express');
 const cors = require('cors');
-const { redis } = require('./utils/redis');
-const { login, register, validateUser } = require('./controllers/Auth');
+const { login, register, validateUser, logout } = require('./controllers/Auth');
 const { checkToken } = require('./middlewares/Validate');
 const { homePage } = require('./controllers/Home');
+const { redis } = require('./utils/redis');
 
 const port = 3000;
 const app = express();
@@ -19,11 +19,9 @@ app.get("/", checkToken, homePage);
 app.get("/validateuser", validateUser);
 app.post("/register", register);
 app.post("/login", login);
-
-redis.on('error', err => console.log('Redis Client Error', err));
+app.post("/logout", logout);
 
 app.listen(port, async () => {
+  redis.connect();
   console.log("App running on port ", port);
 })
-
-

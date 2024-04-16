@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { query } = require('../database/database');
-const { redis } = require('./utils/redis');
+const { redis } = require('../utils/redis');
 
 module.exports = {
   login: async (req, res) => {
@@ -78,7 +78,11 @@ module.exports = {
 
     try {
       const { id, name } = jwt.verify(token, process.env.PRIVATE_KEY);
+      const blackListedRefreshToken = await redis.get(token);
 
+      if (blackListedRefreshToken === 'true') {
+        throw new Error("Acess denied!");
+      }
       return res.status(200).send({ id, name });
     } catch (error) {
       console.error(error);
@@ -88,5 +92,17 @@ module.exports = {
     }
   },
 
-  logout: async (req, res) => {}
+  logout: async (req, res) => {
+    const { cookie } = req.body;
+    const [, token] = cookie.split("=");
+
+    const accessTokenPayload = jwt.verify(token, process.env.PRIVATE_KEY)
+    const formattedCurrentTime = Math.floor(Date.now() / 1000);
+
+    const accessTokenLife = accessTokenPayload.exp - formattedCurrentTime;
+
+    await redis.setEx(token, accessTokenLife, 'true');
+
+    res.status(200).send("successfully logged out.");
+  }
 };

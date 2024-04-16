@@ -1,13 +1,19 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from 'react-router-dom';
+import api from "../utils/api";
 
 function Home() {
   const { authenticatedUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const onLogout = () => {
+  const onLogout = async () => {
+    await api.post(
+      "/logout",
+      { cookie: document.cookie }
+    )
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
     navigate("/login");
   }
 
