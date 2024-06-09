@@ -81,7 +81,7 @@ module.exports = {
       const blackListedRefreshToken = await redis.get(token);
 
       if (blackListedRefreshToken === 'true') {
-        throw new Error("Acess denied!");
+        throw new Error("Access denied!");
       }
       return res.status(200).send({ id, name });
     } catch (error) {
